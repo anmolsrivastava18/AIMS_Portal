@@ -3,9 +3,14 @@ Materials (BOM) in the AIMS portal. Running this script will lead to the auto-fi
 the BOM creation page.
 
 The workflow of this script is as follows:
-(1) It will open a browser and go the AIMS web page.
-(2) It will enter username and password and will click on the login button.
-(3) It will click on the BOMs Tab in the portal.
+(1) Open a browser and go the AIMS web page
+(2) Enter username and password and will click on the login button
+(3) Click on the BOMs Tab in the portal
+(4) Click on the add button
+(5) Populate the fields on the BOM creation page
+(6) Choose the BOM to be uploaded
+(7) Save the BOM
+(8) Repeat the above steps for other BOMs
 """
 
 from selenium import webdriver
