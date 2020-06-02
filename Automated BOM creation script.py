@@ -160,10 +160,12 @@ for bom_name in list_bom_names:
     workbook = xlrd.open_workbook("{}/{}".format(path_to_bom_folder, bom_name))
     worksheet = workbook.sheet_by_index(0)
     num_rows = worksheet.nrows
+
     click_on_add_button()  # Going to BOM creation page
+
     populate_fields()  # Let's populate the relevant fields using excel sheet data :)
 
-# Uploading a file
-Upload_Button = browser.find_element_by_id('id_bom_file')
-Upload_Button.send_keys("{}/{}".format(path_to_bom_folder, bom_name))
-Upload_Button.submit()
+    # Uploading a file
+    Upload_Button = browser.find_element_by_id('id_bom_file')
+    Upload_Button.send_keys("{}/{}".format(path_to_bom_folder, bom_name))
+    Upload_Button.submit()  # Saving the BOM after creation
