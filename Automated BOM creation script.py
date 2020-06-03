@@ -35,20 +35,31 @@ for file in os.listdir(path_to_bom_folder):
         list_bom_names.append(file)
 
 
+def wait_until_element_becomes_clickable(x_path_of_element):
+
+    """Script will use this function to wait until the web page loads completely or the element
+    to be clicked becomes clickable. The function takes as its argument the Xpath of the element
+    to be clicked"""
+
+    # Script will wait for 0.5 sec for any web page to be loaded, after this time the script will declare
+    # that the page took too long to load and will keep waiting for this page to be loaded
+    delay = 1
+    try:
+        WebDriverWait(browser, delay).until(ec.element_to_be_clickable((By.XPATH, x_path_of_element)))
+        print("Page is ready!")
+    except TimeoutException:
+        print("Loading took too much time!")
+
+
 def login_to_portal():
 
     """Using the login_to_portal function, script will login to the AIMS portal."""
 
     url = "https://aims.adonmo.com"  # url for the AIMS portal
     browser.get(url)
-    delay = 0.5  # Script will wait for 0.5 sec for page to reload
 
-    # Using the below try-except block, script will wait until the page is completely loaded
-    try:
-        WebDriverWait(browser, delay).until(ec.presence_of_element_located((By.ID, 'IdOfMyElement')))
-        print("Page is ready!")
-    except TimeoutException:
-        print("Loading took too much time!")
+    # Using the below function call, script will wait until the login button becomes clickable
+    wait_until_element_becomes_clickable('//*[@id="login-form"]/input[2]')
 
     # Now, script will enter the username and password
     username = browser.find_element_by_name("username")
@@ -89,8 +100,6 @@ def populate_fields():
     bom_title = browser.find_element_by_xpath('//*[@id="id_bom_name"]')
     bom_title.send_keys(worksheet.cell(0, 0).value)
 
-    delay = 1
-
     # In case the excel sheets is empty then the remove button will take the value of i = 0 so that to
     # remove the very first row itself. To get better understanding, have a look at the next block of code
     # for the remove button
@@ -101,25 +110,11 @@ def populate_fields():
         # Entering the data in the search field
         search_button = browser.find_element_by_class_name('select2-selection__placeholder')
         search_button.click()
-
-        try:
-            # WebDriverWait(browser, delay).until(ec.presence_of_element_located((By.ID, 'IdOfMyElement')))
-            WebDriverWait(browser, delay).until(ec.element_to_be_clickable((By.ID, 'IdOfMyElement')))
-            print("Page is ready!")
-        except TimeoutException:
-            print("Loading took too much time!")
-
         search_field = browser.find_element_by_class_name('select2-search__field')
         search_field.send_keys(worksheet.cell(i, 1).value)
 
-        # Will be using the following block of try and except to ensure that the drop-down list of the
-        # part_number gets enough time to load and then only the program moves forward
-        try:
-            # WebDriverWait(browser, delay).until(ec.presence_of_element_located((By.ID, 'IdOfMyElement')))
-            WebDriverWait(browser, delay).until(ec.element_to_be_clickable((By.ID, 'IdOfMyElement')))
-            print("Page is ready!")
-        except TimeoutException:
-            print("Loading took too much time!")
+        # Script will wait until the entered element name appears in the drop down list
+        wait_until_element_becomes_clickable('//*[@id="select2-bhv6-results"]')
 
         search_field.send_keys(Keys.ENTER)  # Clicking the option showing in the drop down list
 
@@ -137,12 +132,9 @@ def populate_fields():
         # Adding a new row after populating the previous row
         add_row_button = browser.find_element_by_xpath('//*[@id="add_row"]/span')
         add_row_button.click()
-        try:
-            # WebDriverWait(browser, delay).until(ec.presence_of_element_located((By.ID, 'IdOfMyElement')))
-            WebDriverWait(browser, delay).until(ec.element_to_be_clickable((By.ID, 'IdOfMyElement')))
-            print("Page is ready!")
-        except TimeoutException:
-            print("Loading took too much time!")
+
+        # Script will wait until the next row appears
+        wait_until_element_becomes_clickable('select2-selection__placeholder')
 
     # Removing an extra row
     remove_row_button = browser.find_element_by_xpath('//*[@id="table_body"]/tr[{}]/td[6]/a/span'.format(i))
@@ -150,6 +142,10 @@ def populate_fields():
 
 
 login_to_portal()  # Login to the AIMS portal
+
+# Wait until the BOMs tab button shows
+wait_until_element_becomes_clickable('//*[@id="accordionSidebar"]/li[5]/a/span')
+
 go_to_bom_tab()  # Go to BOMs tab in the portal
 
 bom_name = ""  # If the BOM folder is empty
@@ -161,7 +157,12 @@ for bom_name in list_bom_names:
     worksheet = workbook.sheet_by_index(0)
     num_rows = worksheet.nrows
 
+    # Script will wait until the add button becomes clickable
+    wait_until_element_becomes_clickable('//*[@id="content"]/div/div/div[1]/a[1]')
     click_on_add_button()  # Going to BOM creation page
+
+    # Wait until the BOM creation page loads completely
+    wait_until_element_becomes_clickable('//*[@id="content"]/div/div/div[2]/form/a/span')
 
     populate_fields()  # Let's populate the relevant fields using excel sheet data :)
 
